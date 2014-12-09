@@ -1,0 +1,25 @@
+[ui]
+username=
+ssh = ssh -C
+
+[extensions]
+prompt = ~/apps/hg-prompt/prompt.py
+progress = 
+hgext.extdiff =
+color =
+shelve = 
+purge =
+
+[extdiff]
+cmd.kdiff3 =
+
+
+[annotate]
+ignorews = True
+ignorewsamount = True
+ignoreblanklines = True
+
+[diff]
+ignorews = True
+ignorewsamount = True
+ignoreblanklines = True

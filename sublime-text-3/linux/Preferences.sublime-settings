@@ -1,0 +1,19 @@
+{
+	"color_scheme": "Packages/User/Flatland Dark (SL).tmTheme",
+	"detect_indentation": false,
+	"flatland_sidebar_tree_xsmall": true,
+	"flatland_square_tabs": true,
+	"font_size": 10,
+	"ignored_packages":
+	[
+		"Vintage",
+		"Markdown Preview"
+	],
+	"scroll_past_end": false,
+	"show_encoding": true,
+	"tab_size": 2,
+	"theme": "Flatland Dark.sublime-theme",
+	"translate_tabs_to_spaces": true,
+	"trim_trailing_white_space_on_save": true,
+	"word_wrap": true
+}

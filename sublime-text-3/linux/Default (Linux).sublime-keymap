@@ -1,0 +1,41 @@
+[
+  {
+    "keys": [
+      "ctrl+s"
+    ],
+    "command": "save_all"
+  },
+  {
+    "keys": [
+      "alt+shift+f"
+    ],
+    "command": "reindent",
+    "args": {
+      "single_line": false
+    }
+  },
+  {
+    "keys": [
+      "ctrl+shift+."
+    ],
+    "command": "erb"
+  },
+  {
+    "keys": [
+      "ctrl+1"
+    ],
+    "command": "toggle_comment",
+    "args": {
+      "block": false
+    }
+  },
+  {
+    "keys": [
+      "ctrl+shift+1"
+    ],
+    "command": "toggle_comment",
+    "args": {
+      "block": true
+    }
+  }
+]
