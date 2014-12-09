@@ -1,4 +1,3 @@
-// davidgg gulpfile conf
 var gulp = require('gulp');
 
 var sass = require('gulp-sass');
@@ -14,14 +13,23 @@ var reload      = browserSync.reload;
 
 var taskError = function(error){ console.log(error.toString());this.emit('end'); };
 
+var src={
+  js:   "src/js/**/*.js",
+  scss: "src/scss/**/*.scss",
+  html: "src/html/**/*.html",
+  reset_css: ['src/css/normalize.css', 'src/css/main.css'],
+  prev_js: ['src/js/prev/plugins.js']
+};
+
+var local_address = "localhost:8000";
 
 gulp.task('default', ['sass', 'scripts', 'watch']);
 
 // Transform scss to css, minify it and concat all
 gulp.task('sass', function() {
   return streamqueue({ objectMode: true },
-    gulp.src(['src/raw_css/normalize.css', 'src/raw_css/main.css']),
-    gulp.src('src/scss/*.scss').pipe(sass()).on('error', taskError)
+    gulp.src(src.reset_css),
+    gulp.src(src.scss).pipe(sass()).on('error', taskError)
     )
   .pipe(minifyCSS())
   .on('error', taskError)
@@ -32,7 +40,10 @@ gulp.task('sass', function() {
 
 // Uglify JS and concat all
 gulp.task('scripts', function() {
-  gulp.src(['src/raw_js/plugins.js', 'src/raw_js/main.js'])
+  return streamqueue({ objectMode: true },
+    gulp.src(src.prev_js),
+    gulp.src(src.js)
+    )
   .pipe(uglify())
   .on('error', taskError)
   .pipe(concat('app.js'))
@@ -42,7 +53,7 @@ gulp.task('scripts', function() {
 
 //Minimify HTML
 gulp.task('html', function() {
-  gulp.src('src/*.html')
+  gulp.src(src.html)
   .pipe(htmlmin({
     collapseWhitespace: true,
     removeComments: true,
@@ -58,7 +69,7 @@ gulp.task('html', function() {
 // Load browser
 gulp.task('browser-sync', function() {
   browserSync({
-    proxy: "localhost:8000"
+    proxy: local_address
   });
 });
 
@@ -66,21 +77,19 @@ gulp.task('browser-sync', function() {
 // Waits for JS AND SCSS changes
 gulp.task('watch',['browser-sync'], function(){
 
-  var watcher_js = gulp.watch('raw_js/**/*.js', ['scripts', reload]);
+  var watcher_js = gulp.watch(src.js, ['scripts', reload]);
   watcher_js.on('change', function(event) {
     console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
   });
 
-  var watcher_sass = gulp.watch('scss/**/*.scss', ['sass', reload]);
+  var watcher_sass = gulp.watch(src.scss, ['sass', reload]);
   watcher_sass.on('change', function(event) {
     console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
   });
 
-  var watcher_html = gulp.watch('src/*.html', ['html', reload]);
+  var watcher_html = gulp.watch(src.html, ['html', reload]);
   watcher_html.on('change', function(event) {
     console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
   });
 
 });
-
-
