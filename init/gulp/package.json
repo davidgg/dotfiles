@@ -9,7 +9,6 @@
   "devDependencies": {
     "browser-sync": "^1.7.2",
     "del": "^1.1.0",
-    "event-stream": "^3.1.7",
     "gulp": "^3.8.10",
     "gulp-concat": "^2.4.2",
     "gulp-htmlmin": "^0.2.0",
