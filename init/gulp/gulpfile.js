@@ -11,6 +11,10 @@ var streamqueue = require('streamqueue');
 var gulpif = require('gulp-if');
 var del = require('del');
 
+var imagemin = require('gulp-imagemin');
+var pngquant = require('imagemin-pngquant');
+var spritesmith = require('gulp.spritesmith');
+
 var browserSync = require('browser-sync');
 var reload      = browserSync.reload;
 
@@ -20,9 +24,10 @@ var src={
   js:   "src/js/*.js",
   scss: "src/scss/**/*.scss",
   html: "src/html/**/*.html",
-  img: "src/img/**",
+  img: "src/img/*",
+  sprites: "src/img/sprites/*",
   reset_css: ['src/css/normalize.css', 'src/css/main.css'],
-  prev_js: ['src/js/prev/plugins.js'],
+  prev_js: ['src/js/prev/*.js'],
   vendor: ['src/js/vendor/**/*.js']
 };
 
@@ -33,8 +38,8 @@ var config = {
 var local_address = "localhost:8000";
 
 gulp.task('set-development', function(){config.production = false;});
-gulp.task('dev', ['set-development', 'clean', 'sass', 'scripts', 'img', 'browser-sync', 'watch']);
-gulp.task('default', ['clean', 'sass', 'scripts', 'img']);
+gulp.task('dev', ['set-development', 'clean', 'html', 'scripts', 'img', 'sprites', 'sass','browser-sync', 'watch']);
+gulp.task('default', ['clean', 'html', 'scripts', 'img', 'sprites', 'sass']);
 
 
 // Transform scss to css, minify it and concat all
@@ -85,9 +90,25 @@ gulp.task('html', function() {
 
 gulp.task('img', function(){
   gulp.src(src.img)
-  .pipe(gulp.dest('img'));
+  .pipe(imagemin({
+    progressive: true,
+    optimizationLevel: 2,
+    svgoPlugins: [{removeViewBox: false}],
+    use: [pngquant()]
+  }))
+  .pipe(gulp.dest('img'))
 });
 
+gulp.task('sprites', function(){
+  gulp.src(src.sprites).pipe(spritesmith({
+    imgName: 'sprites.png',
+    imgPath: '../img/sprites/sprites.png',
+    cssName: '../../src/scss/includes/_sprites.scss'
+  }))
+  .pipe(gulp.dest('img/sprites'));
+});
+
+// Clean output directories
 gulp.task('clean', function(){
   del.sync([
     'img/*',
@@ -95,6 +116,7 @@ gulp.task('clean', function(){
     'js/*'
     ]);
 });
+
 
 // Load browser
 gulp.task('browser-sync', function() {
@@ -106,20 +128,21 @@ gulp.task('browser-sync', function() {
 
 // Waits for JS AND SCSS changes
 gulp.task('watch', function(){
+  var watcher;
+  var watchers_list = [
+  {task: 'scripts', route: src.js},
+  {task: 'sass', route: src.scss},
+  {task: 'html', route: src.html},
+  {task: 'img', route: src.img},
+  {task: 'sprites', route: src.sprites}
+  ];
 
-  var watcher_js = gulp.watch(src.js, ['scripts', reload]);
-  watcher_js.on('change', function(event) {
-    console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
-  });
+  for(var i = 0; i < watchers_list.length; i++){
+    watcher = watchers_list[i];
 
-  var watcher_sass = gulp.watch(src.scss, ['sass', reload]);
-  watcher_sass.on('change', function(event) {
-    console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
-  });
-
-  var watcher_html = gulp.watch(src.html, ['html', reload]);
-  watcher_html.on('change', function(event) {
-    console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
-  });
-
+    gulp.watch(watcher.route, [watcher.task, reload])
+    .on('change', function(event) {
+      console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+    });
+  }
 });
